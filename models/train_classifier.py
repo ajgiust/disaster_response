@@ -32,7 +32,7 @@ def load_data(database_filepath):
         Y -- matrix of message category labels
     '''
     engine = create_engine('sqlite:///' + database_filepath)
-    df = pd.read_sql_table('DisasterResponse', engine)
+    df = pd.read_sql_table(database_filepath, engine)
     X = df['message'].values
     category_names = df.drop(['id', 'message', 'original', 'genre'], axis=1).columns
     Y = df.drop(['id', 'message', 'original', 'genre'], axis=1).values
