@@ -61,6 +61,11 @@ def tokenize(text):
 
 
 def build_model():
+    '''Builds a multi-output classifier with linear SVC from a ML pipeline.
+    
+    Returns:
+        model
+    '''
     model = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -71,6 +76,15 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''Evaluates performance of model for each category using precision, 
+    recall, and f1 score
+    
+    Arguments:
+        model {var} -- model variable
+        X_test {array} -- X_test variable
+        Y_test {array} -- Y_test variable
+        category_names {array} -- array of category names
+    '''
     y_pred = model.predict(X_test)
 
     for i in range(len(y_pred[0,:])):
@@ -82,6 +96,12 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''Export model to pickle fil
+    
+    Arguments:
+        model {var} -- model variable
+        model_filepath {str} -- file path to model
+    '''
     pickle_out = open(model_filepath,"wb")
     pickle.dump(model, pickle_out)
     pickle_out.close()
