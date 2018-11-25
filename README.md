@@ -1,5 +1,27 @@
 # Disaster Response Pipeline Project
 
+### Summary:
+The purpose of this project is to create a machine learning pipleline which catagorizes messages that were sent during disaster events. Once catagorized, these messages could be sent to appropriate disaster relief agencies.
+
+This model is visualized though a web app that can be accessed following the below instructions.
+
+### Files:
+- app
+| - template
+| |- master.html  # main page of web app
+| |- go.html  # classification result page of web app
+|- run.py  # Flask file that runs app
+
+- data
+|- disaster_categories.csv  # data to process 
+|- disaster_messages.csv  # data to process
+|- process_data.py
+|- DisasterResponse.db   # database to save clean data to
+
+- models
+|- train_classifier.py
+|- classifier.pkl  # saved model 
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
