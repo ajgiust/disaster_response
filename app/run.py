@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar, Scatter, Layout
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
@@ -28,6 +28,8 @@ def tokenize(text):
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('data/DisasterResponse.db', engine)
+X = df['message'].values
+Y = df.drop(['id', 'message', 'original', 'genre'], axis=1)
 
 # load model
 model = joblib.load("../models/classifier.pkl")
@@ -42,6 +44,12 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+
+    category_counts = Y.sum().sort_values()
+    category_names = list(category_counts.index)
+
+    cat_counts_by_genre = df.groupby('genre').sum().drop(['id'], axis=1).reset_index()
+
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -63,6 +71,51 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+            'data': [
+                Bar(
+                    x=category_counts,
+                    y=category_names,
+                    orientation="h",
+                    marker={'color': 'green'
+                    }
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message Categories',
+                'yaxis': {
+                    'title': "Category"
+                },
+                'xaxis': {
+                    'title': "Count"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=category_names,
+                    y=cat_counts_by_genre.iloc[0,:],
+                    name=cat_counts_by_genre['genre'][0]
+                ),
+                Bar(
+                    x=category_names,
+                    y=cat_counts_by_genre.iloc[1,:],
+                    name=cat_counts_by_genre['genre'][1]
+                ),
+                Bar(
+                    x=category_names,
+                    y=cat_counts_by_genre.iloc[2,:],
+                    name=cat_counts_by_genre['genre'][2]
+                )
+            ],
+
+            'layout': Layout(
+                barmode='stack',
+                title="Distribution of Messages by Category & Genre"
+            )       
         }
     ]
     
