@@ -61,16 +61,24 @@ def tokenize(text):
 
 
 def build_model():
-    '''Builds a multi-output classifier with linear SVC from a ML pipeline.
+    '''Builds a multi-output classifier with Random Forest from a ML pipeline.
     
     Returns:
         model
     '''
-    model = Pipeline([
+    pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(OneVsRestClassifier(LinearSVC(random_state=42))))
+        ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1, 
+                                                            random_state=42)))
     ])
+
+    parameters = {
+        "clf__estimator__n_estimators": [200, 300, 400],
+        "clf__estimator__min_samples_split": [10, 20, 30],
+    }
+
+    model = GridSearchCV(pipeline, param_grid=parameters)
 
     return model
 
@@ -85,13 +93,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
         Y_test {array} -- Y_test variable
         category_names {array} -- array of category names
     '''
-    y_pred = model.predict(X_test)
+    best_clf = model.best_estimator_
+    best_predictions = best_clf.predict(X_test)
 
-    for i in range(len(y_pred[0,:])):
+    for i in range(len(best_predictions[0,:])):
         print('-' * 10)
         print(category_names[i])
         print('-' * 10)
-        print(classification_report(Y_test[:,i], y_pred[:,i]))
+        print(classification_report(Y_test[:,i], best_predictions[:,i]))
         print('\n')
 
 
